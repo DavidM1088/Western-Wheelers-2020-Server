@@ -10,7 +10,7 @@ def process(id):
     g.process()
     g.save()
     s3 = S3()
-    #s3.upload_file(g.id, g.saved_file)
+    s3.upload_file(g.id, g.saved_file)
 
 ids = []
 fs = os.listdir('./images')
@@ -24,10 +24,10 @@ for fle in fs:
 ids.sort()
 
 for id in ids:
-    print("process:"+id)
+    print("start process:"+id)
     process(id)
     print (id)
-    break
+    #break
 
 
 #cv2.waitKey(1000)

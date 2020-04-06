@@ -11,10 +11,12 @@ class Image_G:
         file = 'images/'+id+'.png'
         self.img = cv2.imread(file)
         self.rows, self.cols, colors = self.img.shape
+
         self.row_edge = self.rows // 20
-        self.row_start = self.row_edge
+        self.row_start = self.rows // 2
         self.row_end = self.rows - self.row_edge
-        self.col_edge = self.cols // 20
+
+        self.col_edge = self.cols // 3
         self.col_start = self.col_edge
         self.col_end = self.cols - self.col_edge
 
@@ -48,6 +50,7 @@ class Image_G:
         return score
 
     def process(self):
+        first = True
         for r in range (self.row_start, self.row_end):
             same_cnt = 0
             same_start = None
@@ -60,33 +63,30 @@ class Image_G:
                 if not last is None:
                     s1 = self.get_score(self.img[r, c])
                     s2 = self.get_score(last)
-                    if abs (s1 - s2) < 19 and self.monochrome_score(self.img[r, c]) < 3:
-                        #if str(img[r, c]) == str(last):
+                    # similar color and similar is bright and white
+                    if abs (s1 - s2) < 40 :#and s1 > 300 and self.monochrome_score(self.img[r, c]) < 16:
                         same_cnt += 1
                     else:
                         same_start = c
                         same_cnt = 0
+
                 last = self.img[r, c]
 
-                dark = 0
-
                 if same_cnt > 4:
-                    #print ("found run")
-                    val = self.img[r, c-same_cnt-38]
-                    right = 10;
-                    left = 10;
+                    #if first:
+                    #    print ("found run")
                     if same_start is not None:
+                        replace_with = self.img[r, same_start-4]
+                        right = 10
+                        left = 0
                         for cx in range(same_start-left, c+right):
                             if cx < self.cols:
-                                self.img[r, cx] = val #(0,127,0) #val
-                                #pass
-                    c += right+1
-                    same_cnt = 0
-                    same_start = 0
-                    same_start = None
+                                self.img[r, cx] = replace_with #(0,127,0) #val
+                        c += right+5
+                        same_cnt = 0
+                        same_start = c
 
-                else:
-                    c += 1
+                c += 1
 
 
     def save(self):
