@@ -25,7 +25,7 @@ def hist_match(source, template, ignore_black = True):
             The transformed output image
     """
 
-    oldshape = source.shape
+    oldshape = source.shape 
     source = source.ravel()
     template = template.ravel()
 
