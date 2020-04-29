@@ -1,14 +1,18 @@
 import cv2
 import numpy as np
+import uuid
 
-class Image_G:
+class ImageWaterMarkRemover:
     light_threshold = 3 * 230
     dark_threshold = 3 * 180
     img = None
+    idx = 0
 
-    def __init__(self, id):
-        self.id = id
-        file = 'images/'+id+'.png'
+    def __init__(self, in_file_name):
+        #self.id = str(uuid.uuid1())
+        self.id = ImageWaterMarkRemover.idx
+        ImageWaterMarkRemover.idx = ImageWaterMarkRemover.idx + 1
+        file = 'images/'+in_file_name+'.png'
         self.img = cv2.imread(file)
         self.rows, self.cols, colors = self.img.shape
 
@@ -49,7 +53,7 @@ class Image_G:
         # score += abs(p[2] - p[0])
         return score
 
-    def process(self):
+    def remove_watermark(self):
         first = True
         for r in range (self.row_start, self.row_end):
             same_cnt = 0
@@ -90,11 +94,13 @@ class Image_G:
 
 
     def save(self):
-        scale_percent = 60  # percent of original size
+        scale_percent = 5  # percent of original size
+        scale_percent = 100  # percent of original size
         width = int(self.img.shape[1] * scale_percent / 100)
         height = int(self.img.shape[0] * scale_percent / 100)
         dim = (width, height)
         # resize image
         resized = cv2.resize(self.img, dim) #, interpolation=cv2.INTER_AREA)
-        self.saved_file = 'images/output/'+self.id+'.png'
+        self.saved_file = 'images/output/ww_image_' + str(self.id) + '.png'
+        print (self.saved_file)
         cv2.imwrite(self.saved_file, resized)
