@@ -1,10 +1,10 @@
 import cv2
-from S3 import S3
-from ImageWatermarkRemover import ImageWaterMarkRemover
+#from S3 import S3
+#from ImageWatermarkRemover import ImageWaterMarkRemover
 from os import walk
 import os
 
-s3 = S3()
+#s3 = S3()
 
 def process(in_file_name):
     image =ImageWaterMarkRemover(in_file_name)
