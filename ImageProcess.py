@@ -132,7 +132,7 @@ def process_file(fle):
     ##img = cv2.imread('images/pm10.png')
     img = cv2.imread(fle)
     rows, cols, colors = img.shape
-    print ("rows", rows, cols)
+    print ("rows ", rows, cols)
     row_edge = rows // 5
     row_start = row_edge
     row_end = rows - row_edge
