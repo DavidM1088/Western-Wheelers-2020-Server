@@ -4,6 +4,7 @@ import copy
 import random
 import os
 import time
+from matplotlib import pyplot as plt
 
 def get_brightness_score(pix):
     white = 0
@@ -164,12 +165,28 @@ for i in range(4000000):
     for e in entries:
         #print (e)
         nm = dir +'/'+e
-        if e in done:
-            time.sleep(0.1)
-            print ('...', i)
-            continue
+        # if e in done:
+        #     time.sleep(0.1)
+        #     print ('...', i)
+        #     continue
 
-        process_file(nm)
-        print("DONE:" + e)
+        #process_file(nm)
+        img = cv2.imread(nm)
+        #cv2.imshow('im2', img)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
+        #print("DONE:" + e)
+        print (nm)
+        if nm.find("1.png") < 0:
+            continue
+        image = plt.imread(nm)
+        plt.imshow(image)
+        plt.show()
+        input1 = input()
+        #plt.imshow(img) #, cmap='gray', interpolation='bicubic')
+        #plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+        #plt.show()
+
+        time.sleep(1000)
         done.append(e)
         continue
