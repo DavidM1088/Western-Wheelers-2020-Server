@@ -214,7 +214,7 @@ done = os.listdir(dir)
 cnt = 0
 while True:
     entries = os.listdir('../../Desktop')
-    time.sleep(0.5)
+    time.sleep(0.5) 
     for e in entries:
         # if e.find('1.png') < 0:
         #     continue
