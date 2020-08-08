@@ -69,7 +69,7 @@ class ImageProcess:
                     tot_b = 0
                     cnt = 0
                     span = 20000
-                    for c1 in range(40, span):
+                    for c1 in range(20, span):
                         if c1 > c :
                             raise Exception("no edge to letter, row, col:", r, c)
                         if not self.is_letter(self.img_in, r, c-(direction*c1)):
@@ -132,9 +132,19 @@ class ImageProcess:
         self.clicks += 1
 
     def save(self):
-        num = len(os.listdir(self.out_dir))
-        num += 100000
-        dt = time.strftime('%Y\%m\%d')
+        # num = len(os.listdir(self.out_dir))
+        # num += 100000
+        # dt = time.strftime('%Y\%m\%d')
+
+        # get next number
+        index_fle = open(self.out_dir + "/index.txt", "r")
+        max_num = None
+        for line in index_fle:
+            fields = line.split(', ')
+            if max_num is None or fields[0] > max_num:
+                max_num = fields[0]
+        index_fle.close()
+        num = int(max_num)+1
 
         cords_lat = 0
         cords_long = 0
@@ -143,7 +153,8 @@ class ImageProcess:
             if len(coords) > 0:
                 cords_lat = coords.split(',')[0]
                 cords_long = coords.split(',')[1]
-
+                
+        dt = time.strftime('%Y\%m\%d')
         index_fle = open(self.out_dir + "/index.txt", "a")
         index_fle.write(str(num) + ', ' + dt + ', ' + self.desc.get() + ", " + str(cords_lat) + ", "+str(cords_long) + ", "+self.url.get() + "\n")
         index_fle.close()
@@ -214,7 +225,7 @@ done = os.listdir(dir)
 cnt = 0
 while True:
     entries = os.listdir('../../Desktop')
-    time.sleep(0.5) 
+    time.sleep(1.0)
     for e in entries:
         # if e.find('1.png') < 0:
         #     continue
