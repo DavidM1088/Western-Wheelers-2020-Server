@@ -5,7 +5,8 @@ import tkinter as tk
 import random
 import numpy as np
 from datetime import datetime
-from PIL import Image, ImageTk
+from PIL import Image, ImageEnhance
+import PIL
 
 class ImageProcess:
     clicks = None
@@ -55,9 +56,6 @@ class ImageProcess:
         return diff < 50
 
     def blank_out(self, col_start, col_end, direction):
-        # for x in range(self.top_left[0], self.btm_right[0]):
-        #     for y in range(self.top_left[1], self.btm_right[1]):
-        #         self.img1.put("#ffffff", (x, y))
         print ('start row, col:', self.top_left[1], self.top_left[0])
         for r in range(self.top_left[1], self.btm_right[1]):
             for c in range(col_start, col_end, direction):
@@ -69,17 +67,20 @@ class ImageProcess:
                     tot_b = 0
                     cnt = 0
                     span = 20000
+                    # get average of adjoining colors
                     for c1 in range(20, span):
                         if c1 > c :
                             raise Exception("no edge to letter, row, col:", r, c)
-                        if not self.is_letter(self.img_in, r, c-(direction*c1)):
-                            red, g, b = self.img_in.get(c-c1, r)
-                            tot_r += red
-                            tot_g += g
-                            tot_b += b
-                            cnt += 1
-                            if cnt > 16:
-                                break
+                            #pass
+                        else:
+                            if not self.is_letter(self.img_in, r, c-(direction*c1)):
+                                red, g, b = self.img_in.get(c-c1, r)
+                                tot_r += red
+                                tot_g += g
+                                tot_b += b
+                                cnt += 1
+                                if cnt > 16:
+                                    break
                     if cnt > 0:
                         tot_r = tot_r // cnt
                         tot_g = tot_g // cnt
@@ -97,9 +98,13 @@ class ImageProcess:
                     #span += random.randint(0, 2)
                     #for rn in range(-span, span):
                     for cn in range(-span, span):
+                        if tot_r < 0: tot_r = 0
+                        if tot_g < 0: tot_g = 0
+                        if tot_b < 0: tot_b = 0
                         if tot_r > 255: tot_r = 255
                         if tot_g > 255: tot_g = 255
                         if tot_b > 255: tot_b = 255
+                        print("ave colrs", tot_r, tot_g, tot_b)
                         colr = "#%02x%02x%02x" % (tot_r, tot_g, tot_b)
                         self.img_out.put(colr, (c + cn, r))
 
@@ -111,25 +116,17 @@ class ImageProcess:
         self.blank_out(self.top_left[0], mid, 1)
         self.blank_out(mid, self.btm_right[0], 1)
         self.canvas.create_image(w + 10, 0, anchor=tk.NW, image=self.img_out)
-        #self.save()
 
-    def print_event(self, event):
-        if self.clicks is None:
-            return
-        position = "(x={}, y={})".format(event.x, event.y)
-        print(event.type, "event", position, self.clicks)
-        if self.clicks == 0:
-            r,g,b = self.img_in.get(event.x, event.y)
-            self.letr_colr = (r, g, b)
-            self.log_text.set("Got letter color, click top left")
-        if self.clicks == 1:
-            self.top_left = (event.x, event.y)
-            self.log_text.set("Got top left, click bottom right")
-        if self.clicks == 2:
-            self.btm_right = (event.x, event.y)
-            self.log_text.set("Got bottom right")
-            self.process_image()
-        self.clicks += 1
+    def saturate(self):
+        img = PIL.Image.open(self.img_fle)
+        #w = img.size[0]
+        enhancer = ImageEnhance.Contrast(img)
+
+        factor = 1.5  # increase contrast
+        img1 = enhancer.enhance(factor)
+        img1.save(self.img_fle)
+        self.img_in = tk.PhotoImage(file=self.img_fle)
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.img_in)
 
     def save(self):
         # num = len(os.listdir(self.out_dir))
@@ -153,7 +150,7 @@ class ImageProcess:
             if len(coords) > 0:
                 cords_lat = coords.split(',')[0]
                 cords_long = coords.split(',')[1]
-                
+
         dt = time.strftime('%Y\%m\%d')
         index_fle = open(self.out_dir + "/index.txt", "a")
         index_fle.write(str(num) + ', ' + dt + ', ' + self.desc.get() + ", " + str(cords_lat) + ", "+str(cords_long) + ", "+self.url.get() + "\n")
@@ -174,6 +171,25 @@ class ImageProcess:
 
     def cancel(self):
         self.root.destroy()
+
+    def print_event(self, event):
+        if self.clicks is None:
+            return
+        position = "(x={}, y={})".format(event.x, event.y)
+        print(event.type, "event", position, self.clicks)
+        if self.clicks == 0:
+            r,g,b = self.img_in.get(event.x, event.y)
+            self.letr_colr = (r, g, b)
+            self.log_text.set("Got letter color, click top left")
+        if self.clicks == 1:
+            self.top_left = (event.x, event.y)
+            self.log_text.set("Got top left, click bottom right")
+        if self.clicks == 2:
+            self.btm_right = (event.x, event.y)
+            self.log_text.set("Got bottom right")
+            self.process_image()
+
+        self.clicks += 1
 
     def show(self, img_file):
         self.root = tk.Tk()
@@ -199,6 +215,7 @@ class ImageProcess:
         self.desc_entry = tk.Entry(self.root, textvariable=self.desc, font = ('calibre', 10, 'normal')).pack()
 
         tk.Button(self.root, text="Start", command=self.start).pack()
+        tk.Button(self.root, text="Saturate", command=self.saturate).pack()
         tk.Button(self.root, text="Save", command=self.save).pack()
         tk.Button(self.root, text="Cancel", command=self.cancel).pack()
 
