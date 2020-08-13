@@ -122,7 +122,7 @@ class ImageProcess:
         #w = img.size[0]
         enhancer = ImageEnhance.Contrast(img)
 
-        factor = 1.5  # increase contrast
+        factor = 1.25  # increase contrast
         img1 = enhancer.enhance(factor)
         img1.save(self.img_fle)
         self.img_in = tk.PhotoImage(file=self.img_fle)
