@@ -45,7 +45,7 @@ class ImageIndexEdit:
                 deleted += 1
                 continue
             lines.append(line)
-        index_fle.close()
+        index_fle.close() 
         print ("Deleted:", deleted)
 
         out_fle = open(self.dir + "/index.txt", "w")
